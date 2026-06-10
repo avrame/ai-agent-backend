@@ -65,7 +65,7 @@ const tools: Anthropic.Tool[] = [
 ];
 
 export const sendMessage = api(
-  { expose: false, method: "POST", path: "/ai/sendMessage" },
+  { expose: true, method: "POST", path: "/ai/sendMessage" },
   async ({ messages }: ChatRequest): Promise<ChatResponse> => {
     const response = await client().messages.create({
       model: "claude-sonnet-4-6",
@@ -75,8 +75,6 @@ export const sendMessage = api(
       messages,
     });
 
-    console.log(response);
-
     const text = response.content
       .filter((block): block is Anthropic.TextBlock => block.type === "text")
       .map((block) => block.text)
@@ -85,8 +83,6 @@ export const sendMessage = api(
     const toolUse = response.content.find(
       (block): block is Anthropic.ToolUseBlock => block.type === "tool_use",
     );
-
-    console.log("toolUse", toolUse);
 
     return { content: text !== "" ? text : undefined, toolUse };
   },
